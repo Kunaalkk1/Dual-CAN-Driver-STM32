@@ -3,7 +3,8 @@ This driver can be integrated in any STM32 Microcontroller with two CAN ports: C
 
 ## Example Usage
 
-1. For transmitting new messages, **call** this function in your application layer:
+### 1. Sending CAN Messages
+For transmitting new messages, **`call`** the function `can_send_data` in your application layer like this:
 
 ```
 /*******************************************************************************************************************************
@@ -20,9 +21,11 @@ This driver can be integrated in any STM32 Microcontroller with two CAN ports: C
 can_send_data(CAN_HandleTypeDef *hcan, uint32_t id, uint32_t dlc, uint8_t *data, bool extd, bool rtr);
 ```
 
-2. For decoding received messages, **define** this function in your application layer:
+### 2. Receiving CAN messages
+For decoding received messages, **`define`** the function `decode_can_rx` in your application layer:
 
 ```
+// Function parameters are same as in 'can_send_data' function
 void decode_can_rx(CAN_HandleTypeDef *hcan, uint32_t id, uint32_t dlc, uint8_t *data, bool extd, bool rtr) {
  	if(hcan->Instance == CAN1) {
 		// Decode data coming on CAN1
@@ -31,5 +34,32 @@ void decode_can_rx(CAN_HandleTypeDef *hcan, uint32_t id, uint32_t dlc, uint8_t *
 	if(hcan->Instance == CAN2) {
 		// Decode data coming on CAN2
 	}
+}
+```
+
+_Note: You can also call `can_send_data` inside `decode_can_rx` to respond to incoming messages_
+
+### 3. Initializing the driver
+To initialize, after setting up CAN at the desired baud rate and **enabling _all_ the `CAN Interrupts` available, do this in the `main.c` file:**
+```
+/* main.c */
+//.... Skip to the below section...//
+/* Private includes */
+/* USER CODE BEGIN Includes */
+#include "can_driver.h" // ----------> Add this line
+/* USER CODE END Includes */
+//.... Skip to the below section...//
+int main(void) {
+//.... Skip to the below section...//
+  /* USER CODE BEGIN 2 */
+     can_init(); // ----------> Add this line
+  /* USER CODE END 2 */
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  while (1)
+  {
+    can_loop(); // ----------> Add this line
+    /* USER CODE END WHILE */
+
 }
 ```
